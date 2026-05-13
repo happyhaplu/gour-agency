@@ -90,7 +90,18 @@
     .animate-pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
 
-    .step-item { opacity: 0; transform: translateX(-16px); }
+    /* Let GSAP control step visibility — don't hide in CSS */
+  .step-item { opacity: 1; }
+
+  /* Tailwind preflight resets — restore what we need */
+  h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; margin: 0; }
+  p { margin: 0; }
+  button { font-family: inherit; cursor: pointer; }
+  img { display: inline; max-width: 100%; }
+  ul, ol { margin: 0; padding: 0; list-style: none; }
+
+  /* Fix sticky scroll offset for fixed nav */
+  html { scroll-padding-top: 80px; }
 
     /* Marquee */
     .marquee-inner { white-space: nowrap; }
@@ -122,14 +133,14 @@
     </div>
     <!-- Desktop links -->
     <div style="display:flex;align-items:center;gap:32px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.7);" class="nav-links">
-      <button onclick="scrollTo('capabilities')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Services</button>
-      <button onclick="scrollTo('telemetry')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">AI Agents</button>
-      <button onclick="scrollTo('saas')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">SaaS</button>
-      <button onclick="scrollTo('mobile')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Mobile</button>
+      <button onclick="smoothScrollTo('capabilities')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Services</button>
+      <button onclick="smoothScrollTo('telemetry')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">AI Agents</button>
+      <button onclick="smoothScrollTo('saas')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">SaaS</button>
+      <button onclick="smoothScrollTo('mobile')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Mobile</button>
     </div>
-    <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn" style="font-size:11px;padding:8px 20px;" class="nav-cta">Book a Call</a>
+    <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn nav-cta" style="font-size:11px;padding:8px 20px;">Book a Call</a>
     <!-- Hamburger -->
-    <button id="hamburger" onclick="toggleMenu()" style="display:none;flex-direction:column;gap:6px;padding:8px;background:none;border:none;cursor:pointer;">
+    <button id="hamburger" onclick="toggleMenu()" style="flex-direction:column;gap:6px;padding:8px;background:none;border:none;cursor:pointer;display:none;" class="hamburger-btn">
       <span style="display:block;width:20px;height:2px;background:white;transition:all 0.3s;"></span>
       <span style="display:block;width:20px;height:2px;background:white;transition:all 0.3s;"></span>
       <span style="display:block;width:20px;height:2px;background:white;transition:all 0.3s;"></span>
@@ -138,10 +149,10 @@
   <!-- Mobile menu -->
   <div id="mobile-menu" style="display:none;background:rgba(5,5,5,0.97);backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,143,45,0.2);padding:16px 24px 32px;">
     <div style="display:flex;flex-direction:column;gap:20px;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">
-      <button onclick="scrollTo('capabilities');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">Services</button>
-      <button onclick="scrollTo('telemetry');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">AI Agents</button>
-      <button onclick="scrollTo('saas');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">SaaS</button>
-      <button onclick="scrollTo('mobile');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">Mobile</button>
+      <button onclick="smoothScrollTo('capabilities');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">Services</button>
+      <button onclick="smoothScrollTo('telemetry');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">AI Agents</button>
+      <button onclick="smoothScrollTo('saas');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">SaaS</button>
+      <button onclick="smoothScrollTo('mobile');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">Mobile</button>
       <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn" style="width:fit-content;margin-top:4px;">Book a Call</a>
     </div>
   </div>
@@ -169,7 +180,7 @@
         </p>
         <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
           <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn">BOOK A STRATEGY CALL →</a>
-          <button onclick="scrollTo('capabilities')" style="background:none;border:none;color:#878787;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:12px 8px;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='#878787'">SEE OUR WORK ↓</button>
+          <button onclick="smoothScrollTo('capabilities')" style="background:none;border:none;color:#878787;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:12px 8px;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='#878787'">SEE OUR WORK ↓</button>
         </div>
       </div>
       <div style="text-align:right;">
@@ -199,15 +210,15 @@
           WE BUILD.<br />YOU SCALE.
         </h2>
         <div style="margin-top:32px;display:flex;flex-direction:column;gap:16px;">
-          <button onclick="scrollTo('telemetry')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
+          <button onclick="smoothScrollTo('telemetry')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
             <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,227,74,0.6);margin-top:2px;flex-shrink:0;">01</span>
             <div><p style="font-family:'Inter Tight',sans-serif;font-weight:700;text-transform:uppercase;color:#F0F0F0;font-size:15px;letter-spacing:-0.02em;margin:0 0 4px;">AI Agents &amp; Automation</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;line-height:1.6;margin:0;">Custom agents that handle your ops, support &amp; outreach — 24/7, without headcount.</p></div>
           </button>
-          <button onclick="scrollTo('saas')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
+          <button onclick="smoothScrollTo('saas')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
             <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,227,74,0.6);margin-top:2px;flex-shrink:0;">02</span>
             <div><p style="font-family:'Inter Tight',sans-serif;font-weight:700;text-transform:uppercase;color:#F0F0F0;font-size:15px;letter-spacing:-0.02em;margin:0 0 4px;">Custom SaaS &amp; Web Apps</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;line-height:1.6;margin:0;">Full-stack platforms from MVP to scale. Shipped in weeks, built to last years.</p></div>
           </button>
-          <button onclick="scrollTo('mobile')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
+          <button onclick="smoothScrollTo('mobile')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
             <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,227,74,0.6);margin-top:2px;flex-shrink:0;">03</span>
             <div><p style="font-family:'Inter Tight',sans-serif;font-weight:700;text-transform:uppercase;color:#F0F0F0;font-size:15px;letter-spacing:-0.02em;margin:0 0 4px;">Mobile App Development</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;line-height:1.6;margin:0;">iOS &amp; Android, simultaneously. Apps built for retention, performance &amp; store approval.</p></div>
           </button>
@@ -485,10 +496,10 @@
       <div>
         <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 24px;">Services</p>
         <div style="display:flex;flex-direction:column;gap:16px;">
-          <button onclick="scrollTo('telemetry')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">AI Agents &amp; Automation</button>
-          <button onclick="scrollTo('saas')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">Custom SaaS &amp; Web Apps</button>
-          <button onclick="scrollTo('mobile')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">Mobile App Development</button>
-          <button onclick="scrollTo('capabilities')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">All Services</button>
+          <button onclick="smoothScrollTo('telemetry')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">AI Agents &amp; Automation</button>
+          <button onclick="smoothScrollTo('saas')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">Custom SaaS &amp; Web Apps</button>
+          <button onclick="smoothScrollTo('mobile')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">Mobile App Development</button>
+          <button onclick="smoothScrollTo('capabilities')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">All Services</button>
         </div>
       </div>
       <!-- Col 3 -->
@@ -522,23 +533,25 @@
     100% { transform: translateX(-50%); }
   }
   @media (max-width: 768px) {
-    .service-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+    .service-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
     .service-grid > div:first-child { position: static !important; }
     .footer-grid { grid-template-columns: 1fr !important; }
     .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
-    #main-nav .nav-links { display: none !important; }
-    #main-nav .nav-cta { display: none !important; }
-    #hamburger { display: flex !important; }
-    section, footer { padding-left: 24px !important; padding-right: 24px !important; }
-    section > div { padding-left: 0 !important; padding-right: 0 !important; }
+    .nav-links { display: none !important; }
+    .nav-cta { display: none !important; }
+    .hamburger-btn { display: flex !important; }
+    #telemetry > div,
+    #saas > div,
+    #mobile > div { padding: 64px 24px !important; }
     #book-call { padding: 80px 24px !important; }
+    footer > div > div:last-child { padding: 0 24px 48px !important; }
   }
 </style>
 
 <!-- ═══════════════════════════ SCRIPTS ═══════════════════════════ -->
 <script>
 // ── Scroll util ──
-function scrollTo(id) {
+function smoothScrollTo(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth' });
 }
@@ -696,11 +709,9 @@ void main(){
     const container = document.getElementById(id);
     if (!container) return;
     const items = container.querySelectorAll('.step-item');
-    gsap.fromTo(items,
-      { opacity:0, x:-16 },
-      { opacity:1, x:0, stagger:0.1, duration:0.6, ease:'expo.out',
-        scrollTrigger:{ trigger:container, start:'top 80%' } }
-    );
+    gsap.set(items, { opacity:0, x:-16 });
+    gsap.to(items, { opacity:1, x:0, stagger:0.1, duration:0.6, ease:'expo.out',
+      scrollTrigger:{ trigger:container, start:'top 80%' } });
   });
 
   // CTA headline + button
