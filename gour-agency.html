@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gour Agency — AI Agents, SaaS & Mobile Apps</title>
+  <meta name="description" content="We build AI agents that replace headcount, SaaS platforms that print revenue, and mobile apps your users keep coming back to." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Inter Tight"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            void: '#050505',
+            'accent-core': '#00E34A',
+            'accent-dim': '#008F2D',
+            'text-primary': '#F0F0F0',
+            'text-muted': '#878787',
+          },
+          borderRadius: {
+            pill: '500px',
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      background: #050505;
+      color: #F0F0F0;
+      font-family: 'Inter Tight', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    .glass-panel {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(0,143,45,0.2);
+    }
+
+    .pill-btn {
+      border-radius: 500px;
+      padding: 12px 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+      border: 1px solid rgba(0,143,45,0.4);
+      color: #00E34A;
+      background: transparent;
+      cursor: pointer;
+      display: inline-block;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .pill-btn:hover {
+      background: #00E34A;
+      color: #050505;
+      border-color: #00E34A;
+    }
+
+    @keyframes dash { to { stroke-dashoffset: 0; } }
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+    .animate-ping { animation: ping 1.5s cubic-bezier(0,0,0.2,1) infinite; }
+    .animate-pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+
+    .step-item { opacity: 0; transform: translateX(-16px); }
+
+    /* Marquee */
+    .marquee-inner { white-space: nowrap; }
+
+    /* Nav gradient overlay */
+    #nav-gradient {
+      position: fixed; top:0; left:0; right:0; height:128px; z-index:40;
+      pointer-events:none;
+      background: linear-gradient(to bottom, rgba(5,5,5,0.8), transparent);
+    }
+
+    /* Section step cards hover */
+    .step-card { transition: border-color 0.2s; }
+    .step-card:hover { border-color: rgba(0,143,45,0.4); }
+  </style>
+</head>
+<body>
+
+<!-- Nav gradient overlay -->
+<div id="nav-gradient"></div>
+
+<!-- ═══════════════════════════ NAVIGATION ═══════════════════════════ -->
+<nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:50;transition:all 0.5s;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;">
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;gap:8px;">
+      <img src="https://gour.io/assests/gour-logo-nav-white.svg" alt="Gour Logo" style="height:32px;width:auto;" />
+      <span style="color:white;font-family:'Inter Tight',sans-serif;font-size:20px;font-weight:400;letter-spacing:0.02em;">Agency</span>
+    </div>
+    <!-- Desktop links -->
+    <div style="display:flex;align-items:center;gap:32px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.7);" class="nav-links">
+      <button onclick="scrollTo('capabilities')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Services</button>
+      <button onclick="scrollTo('telemetry')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">AI Agents</button>
+      <button onclick="scrollTo('saas')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">SaaS</button>
+      <button onclick="scrollTo('mobile')" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Mobile</button>
+    </div>
+    <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn" style="font-size:11px;padding:8px 20px;" class="nav-cta">Book a Call</a>
+    <!-- Hamburger -->
+    <button id="hamburger" onclick="toggleMenu()" style="display:none;flex-direction:column;gap:6px;padding:8px;background:none;border:none;cursor:pointer;">
+      <span style="display:block;width:20px;height:2px;background:white;transition:all 0.3s;"></span>
+      <span style="display:block;width:20px;height:2px;background:white;transition:all 0.3s;"></span>
+      <span style="display:block;width:20px;height:2px;background:white;transition:all 0.3s;"></span>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div id="mobile-menu" style="display:none;background:rgba(5,5,5,0.97);backdrop-filter:blur(24px);border-bottom:1px solid rgba(0,143,45,0.2);padding:16px 24px 32px;">
+    <div style="display:flex;flex-direction:column;gap:20px;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">
+      <button onclick="scrollTo('capabilities');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">Services</button>
+      <button onclick="scrollTo('telemetry');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">AI Agents</button>
+      <button onclick="scrollTo('saas');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">SaaS</button>
+      <button onclick="scrollTo('mobile');toggleMenu()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;text-align:left;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;">Mobile</button>
+      <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn" style="width:fit-content;margin-top:4px;">Book a Call</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section style="position:relative;height:100vh;width:100%;overflow:hidden;display:flex;flex-direction:column;">
+  <canvas id="hero-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;"></canvas>
+  <div style="position:relative;z-index:10;flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:64px;">
+    <h1 style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(56px,11vw,170px);line-height:0.85;letter-spacing:-0.04em;padding:0 0.02em 0 48px;user-select:none;">
+      AUTOMATE YOUR<br />
+      <span style="color:#00E34A;">ENTIRE</span> BUSINESS.
+    </h1>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 48px;margin-top:32px;">
+      <div style="max-width:480px;">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;">AI Agents</span>
+          <span style="color:rgba(0,143,45,0.4);font-size:10px;">•</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;">Custom SaaS</span>
+          <span style="color:rgba(0,143,45,0.4);font-size:10px;">•</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;">Mobile Apps</span>
+        </div>
+        <p style="color:#878787;font-size:15px;line-height:1.7;margin-bottom:24px;max-width:380px;">
+          We build AI agents that replace headcount, SaaS platforms that print revenue, and mobile apps your users keep coming back to.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+          <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn">BOOK A STRATEGY CALL →</a>
+          <button onclick="scrollTo('capabilities')" style="background:none;border:none;color:#878787;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:12px 8px;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='#878787'">SEE OUR WORK ↓</button>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;">
+          SYS.RESPONSE: <span id="sys-time" style="color:#00E34A;">00:00:00</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CAPABILITIES ═══════════════════════════ -->
+<section id="capabilities" style="position:relative;height:400vh;">
+  <div style="position:sticky;top:0;height:100vh;overflow:hidden;perspective:1000px;">
+    <div id="grid-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;">
+      <div id="cap-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:200%;height:200%;position:absolute;transform-style:preserve-3d;">
+      </div>
+    </div>
+    <!-- Glass overlay -->
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;pointer-events:none;">
+      <div class="glass-panel" style="padding:48px;max-width:720px;width:calc(100% - 48px);pointer-events:auto;border-radius:16px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#00E34A;" class="animate-pulse"></div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00E34A;text-transform:uppercase;letter-spacing:0.1em;">Gour Agency — 3 Services</span>
+        </div>
+        <h2 style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(28px,4vw,52px);line-height:1.0;letter-spacing:-0.02em;">
+          WE BUILD.<br />YOU SCALE.
+        </h2>
+        <div style="margin-top:32px;display:flex;flex-direction:column;gap:16px;">
+          <button onclick="scrollTo('telemetry')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,227,74,0.6);margin-top:2px;flex-shrink:0;">01</span>
+            <div><p style="font-family:'Inter Tight',sans-serif;font-weight:700;text-transform:uppercase;color:#F0F0F0;font-size:15px;letter-spacing:-0.02em;margin:0 0 4px;">AI Agents &amp; Automation</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;line-height:1.6;margin:0;">Custom agents that handle your ops, support &amp; outreach — 24/7, without headcount.</p></div>
+          </button>
+          <button onclick="scrollTo('saas')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,227,74,0.6);margin-top:2px;flex-shrink:0;">02</span>
+            <div><p style="font-family:'Inter Tight',sans-serif;font-weight:700;text-transform:uppercase;color:#F0F0F0;font-size:15px;letter-spacing:-0.02em;margin:0 0 4px;">Custom SaaS &amp; Web Apps</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;line-height:1.6;margin:0;">Full-stack platforms from MVP to scale. Shipped in weeks, built to last years.</p></div>
+          </button>
+          <button onclick="scrollTo('mobile')" style="display:flex;align-items:flex-start;gap:16px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:16px;cursor:pointer;transition:all 0.2s;width:100%;" onmouseover="this.style.borderColor='rgba(0,143,45,0.3)';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.borderColor='transparent';this.style.background='none'">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(0,227,74,0.6);margin-top:2px;flex-shrink:0;">03</span>
+            <div><p style="font-family:'Inter Tight',sans-serif;font-weight:700;text-transform:uppercase;color:#F0F0F0;font-size:15px;letter-spacing:-0.02em;margin:0 0 4px;">Mobile App Development</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;line-height:1.6;margin:0;">iOS &amp; Android, simultaneously. Apps built for retention, performance &amp; store approval.</p></div>
+          </button>
+        </div>
+        <div style="margin-top:24px;padding-top:24px;border-top:1px solid rgba(0,143,45,0.2);">
+          <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn" style="font-size:11px;">BOOK A FREE CALL →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SERVICE 01 — AI AGENTS ═══════════════════════════ -->
+<section id="telemetry" style="position:relative;overflow:hidden;border-top:1px solid rgba(0,143,45,0.1);">
+  <div style="padding:96px 48px;max-width:1280px;margin:0 auto;">
+    <!-- Badge -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:64px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(0,227,74,0.6);text-transform:uppercase;letter-spacing:0.15em;border:1px solid rgba(0,143,45,0.3);padding:6px 12px;border-radius:500px;">Service 01</span>
+      <div style="flex:1;height:1px;background:rgba(0,143,45,0.2);"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;" class="service-grid">
+      <!-- Left sticky -->
+      <div style="position:sticky;top:112px;">
+        <div id="img-ai" style="overflow:hidden;border-radius:8px;border:1px solid rgba(0,143,45,0.2);position:relative;aspect-ratio:4/3;">
+          <img src="https://raw.githubusercontent.com/happyhaplu/gour-agency/main/app/public/assets/neural-network.jpg" alt="AI Agents" style="width:100%;height:100%;object-fit:cover;transform:scale(1);transition:transform 0.1s;" />
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(5,5,5,0.6), transparent);"></div>
+          <div style="position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.6);backdrop-filter:blur(24px);border:1px solid rgba(0,143,45,0.2);padding:6px 12px;border-radius:500px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#00E34A;" class="animate-pulse"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#00E34A;text-transform:uppercase;letter-spacing:0.1em;">Agent Active</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">24/7</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Always on</p></div>
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">&lt;2s</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Response time</p></div>
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">80%</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Ticket deflection</p></div>
+        </div>
+      </div>
+      <!-- Right content -->
+      <div>
+        <h2 style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(36px,4.5vw,64px);line-height:0.95;letter-spacing:-0.03em;margin:0 0 24px;">
+          AI AGENTS<br />&amp; AUTOMATION
+        </h2>
+        <p style="color:#878787;line-height:1.7;font-size:16px;max-width:480px;margin:0 0 40px;">
+          Stop hiring for repetitive work. We build custom AI agents that handle your support tickets, lead outreach, data processing, and internal ops — around the clock, without the overhead.
+        </p>
+        <!-- Steps -->
+        <div id="steps-ai" style="margin-bottom:40px;">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 20px;">— How it works</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◎</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Trigger</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">A customer message, form submission, webhook, or schedule fires the agent.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◈</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Reason</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">The agent reads context, queries your knowledge base, and decides the best action.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◉</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Execute</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">It replies, creates records, sends emails, updates your CRM — whatever the task needs.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">✦</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Report</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">Every action logged. You see what ran, what resolved, and where humans are still needed.</p></div></div>
+          </div>
+        </div>
+        <!-- Use cases -->
+        <div style="margin-bottom:32px;">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 16px;">— Use cases</p>
+          <ul style="display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0;">
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Customer support agents that resolve 80% of tickets without human involvement</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Lead qualification & outreach sequences that run on autopilot</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Internal ops bots for HR, finance, and IT request handling</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Data pipelines that extract, enrich, and push clean records to your CRM</span></li>
+          </ul>
+        </div>
+        <!-- Tags -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">OpenAI / GPT-4o</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">LangChain</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">n8n / Make</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Pinecone / RAG</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Zapier / Webhooks</span>
+        </div>
+        <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn">AUTOMATE MY WORKFLOW →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SERVICE 02 — SAAS ═══════════════════════════ -->
+<section id="saas" style="position:relative;overflow:hidden;border-top:1px solid rgba(0,143,45,0.1);">
+  <div style="padding:96px 48px;max-width:1280px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:64px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(0,227,74,0.6);text-transform:uppercase;letter-spacing:0.15em;border:1px solid rgba(0,143,45,0.3);padding:6px 12px;border-radius:500px;">Service 02</span>
+      <div style="flex:1;height:1px;background:rgba(0,143,45,0.2);"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;" class="service-grid">
+      <!-- Left sticky -->
+      <div style="position:sticky;top:112px;">
+        <div id="img-saas" style="overflow:hidden;border-radius:8px;border:1px solid rgba(0,143,45,0.2);position:relative;aspect-ratio:4/3;">
+          <img src="https://raw.githubusercontent.com/happyhaplu/gour-agency/main/app/public/assets/code-reflection.jpg" alt="SaaS Development" style="width:100%;height:100%;object-fit:cover;transform:scale(1);" />
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(5,5,5,0.6), transparent);"></div>
+          <div style="position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.6);backdrop-filter:blur(24px);border:1px solid rgba(0,143,45,0.2);padding:6px 12px;border-radius:500px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#00E34A;" class="animate-pulse"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#00E34A;text-transform:uppercase;letter-spacing:0.1em;">Deploy Ready</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">4 wks</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Avg. MVP time</p></div>
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">99.9%</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Uptime SLA</p></div>
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">10×</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Scale headroom</p></div>
+        </div>
+      </div>
+      <!-- Right -->
+      <div>
+        <h2 style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(36px,4.5vw,64px);line-height:0.95;letter-spacing:-0.03em;margin:0 0 24px;">
+          CUSTOM SAAS<br />&amp; WEB APPS
+        </h2>
+        <p style="color:#878787;line-height:1.7;font-size:16px;max-width:480px;margin:0 0 40px;">
+          From a napkin idea to a live product generating revenue. We design, engineer, and deploy full-stack platforms with clean architecture that scales — shipped in weeks, not quarters.
+        </p>
+        <div id="steps-saas" style="margin-bottom:40px;">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 20px;">— Our build process</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◎</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Discovery</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">We map your product, define the MVP scope, and align on architecture before writing a line of code.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◈</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Design &amp; Plan</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">Wireframes, DB schema, API contracts. You see the full picture before we build.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◉</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Build &amp; Iterate</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">Sprints with weekly demos. You stay in the loop — no black boxes.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">✦</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Launch &amp; Scale</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">CI/CD pipeline, cloud deploy, monitoring live. Your product goes live, not just "done".</p></div></div>
+          </div>
+        </div>
+        <div style="margin-bottom:32px;">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 16px;">— What we build</p>
+          <ul style="display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0;">
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">SaaS dashboards with auth, billing (Stripe), and role-based access</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Internal tools that replace spreadsheets and manual ops workflows</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Customer portals, booking platforms, and marketplace products</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">API backends that power mobile apps, AI agents, and third-party integrations</span></li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">React / Next.js</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Node.js</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Python / FastAPI</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">PostgreSQL</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Stripe</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">AWS / Vercel</span>
+        </div>
+        <!-- Marquee strip -->
+        <div style="overflow:hidden;padding:16px 0;border-top:1px solid rgba(0,143,45,0.1);margin-bottom:32px;">
+          <div class="marquee-inner" style="display:inline-flex;animation:marquee-left 20s linear infinite;">
+            <span style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:rgba(0,227,74,0.15);font-size:28px;letter-spacing:-0.02em;padding:0 24px;white-space:nowrap;">SAAS BUILD // MVP TO SCALE // API FIRST // SHIP IN WEEKS // FULL STACK // ZERO DOWNTIME //&nbsp;</span>
+            <span style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:rgba(0,227,74,0.15);font-size:28px;letter-spacing:-0.02em;padding:0 24px;white-space:nowrap;">SAAS BUILD // MVP TO SCALE // API FIRST // SHIP IN WEEKS // FULL STACK // ZERO DOWNTIME //&nbsp;</span>
+          </div>
+        </div>
+        <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn">SHIP MY PRODUCT →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SERVICE 03 — MOBILE ═══════════════════════════ -->
+<section id="mobile" style="position:relative;overflow:hidden;border-top:1px solid rgba(0,143,45,0.1);">
+  <div style="padding:96px 48px;max-width:1280px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:64px;">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(0,227,74,0.6);text-transform:uppercase;letter-spacing:0.15em;border:1px solid rgba(0,143,45,0.3);padding:6px 12px;border-radius:500px;">Service 03</span>
+      <div style="flex:1;height:1px;background:rgba(0,143,45,0.2);"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;" class="service-grid">
+      <!-- Left sticky -->
+      <div style="position:sticky;top:112px;">
+        <div id="img-mobile" style="overflow:hidden;border-radius:8px;border:1px solid rgba(0,143,45,0.2);position:relative;aspect-ratio:4/3;">
+          <img src="https://raw.githubusercontent.com/happyhaplu/gour-agency/main/app/public/assets/android-face.jpg" alt="Mobile App Development" style="width:100%;height:100%;object-fit:cover;transform:scale(1);" />
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(5,5,5,0.6), transparent);"></div>
+          <div style="position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.6);backdrop-filter:blur(24px);border:1px solid rgba(0,143,45,0.2);padding:6px 12px;border-radius:500px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#00E34A;" class="animate-pulse"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#00E34A;text-transform:uppercase;letter-spacing:0.1em;">Both Stores Live</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">2</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Platforms</p></div>
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">6 wks</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Avg. delivery</p></div>
+          <div class="glass-panel" style="padding:16px;border-radius:8px;text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:700;color:#F0F0F0;font-size:clamp(18px,2vw,26px);margin:0;">5★</p><p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:4px 0 0;">Store target</p></div>
+        </div>
+      </div>
+      <!-- Right -->
+      <div>
+        <h2 style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(36px,4.5vw,64px);line-height:0.95;letter-spacing:-0.03em;margin:0 0 24px;">
+          MOBILE APP<br />DEVELOPMENT
+        </h2>
+        <p style="color:#878787;line-height:1.7;font-size:16px;max-width:480px;margin:0 0 40px;">
+          iOS and Android, one build. We ship cross-platform mobile apps with native performance, polished UX, and a path to both app stores — in weeks not months.
+        </p>
+        <div id="steps-mobile" style="margin-bottom:40px;">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 20px;">— Our delivery process</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◎</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">UI/UX Design</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">Native-feel screens, smooth gestures, and intuitive flows designed for thumbs, not cursors.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◈</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Cross-Platform Build</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">One codebase. Both stores. React Native delivers true native performance without the double dev cost.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">◉</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Store Submission</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">We handle the App Store and Google Play submission process — screenshots, metadata, review cycle.</p></div></div>
+            <div class="step-item step-card" style="display:flex;align-items:flex-start;gap:16px;padding:16px;border-radius:8px;border:1px solid rgba(0,143,45,0.15);"><span style="color:#00E34A;font-size:18px;margin-top:2px;flex-shrink:0;">✦</span><div><p style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#F0F0F0;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 4px;">Launch &amp; Maintain</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">Push notifications, OTA updates, crash monitoring, and feature sprints post-launch.</p></div></div>
+          </div>
+        </div>
+        <div style="margin-bottom:32px;">
+          <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 16px;">— What we build</p>
+          <ul style="display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0;">
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Consumer apps with social features, feeds, and real-time messaging</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">On-demand service apps — booking, delivery, marketplace</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">B2B mobile tools for field teams, sales reps, and operations</span></li>
+            <li style="display:flex;align-items:flex-start;gap:12px;"><span style="color:#00E34A;flex-shrink:0;font-size:12px;margin-top:2px;">→</span><span style="color:#878787;font-size:14px;line-height:1.6;">Companion apps that extend your existing SaaS or web platform</span></li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">React Native</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Expo</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">TypeScript</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">Firebase</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">RevenueCat</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 12px;border-radius:500px;border:1px solid rgba(0,143,45,0.3);color:#878787;">TestFlight</span>
+        </div>
+        <a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn">BUILD MY APP →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CTA BAND ═══════════════════════════ -->
+<section id="book-call" style="position:relative;padding:128px 48px;overflow:hidden;border-top:1px solid rgba(0,143,45,0.2);">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;border-radius:50%;background:radial-gradient(circle, rgba(0,227,74,0.07) 0%, transparent 70%);pointer-events:none;"></div>
+  <div style="max-width:800px;margin:0 auto;text-align:center;position:relative;z-index:10;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:#00E34A;" class="animate-pulse"></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00E34A;text-transform:uppercase;letter-spacing:0.1em;">Taking on new projects — limited spots per month</span>
+      <div style="width:6px;height:6px;border-radius:50%;background:#00E34A;" class="animate-pulse"></div>
+    </div>
+    <h2 id="cta-headline" style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(48px,9vw,140px);line-height:0.9;letter-spacing:-0.04em;margin:0 0 32px;opacity:0;transform:translateY(60px);">
+      READY TO<br /><span style="color:#00E34A;">AUTOMATE</span><br />EVERYTHING?
+    </h2>
+    <p style="color:#878787;font-size:16px;line-height:1.7;max-width:560px;margin:0 auto 48px;">
+      Book a free 30-minute strategy call. We'll identify the highest-leverage thing to automate or build in your business, give you a clear scope, and tell you exactly how fast we can ship it. Zero fluff.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;">
+      <a id="cta-btn" href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" style="display:inline-flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:20px 40px;border-radius:500px;background:#00E34A;color:#050505;text-decoration:none;transition:transform 0.2s;opacity:0;transform:translateY(30px);" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        BOOK A FREE STRATEGY CALL
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;">Free · 30 min · No commitment</span>
+    </div>
+    <div style="margin-top:80px;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-top:48px;border-top:1px solid rgba(0,143,45,0.2);" class="stats-grid">
+      <div style="text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:900;color:#F0F0F0;font-size:clamp(32px,4vw,56px);line-height:1;letter-spacing:-0.03em;margin:0;">48H</p><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 0;">Avg. response time</p></div>
+      <div style="text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:900;color:#F0F0F0;font-size:clamp(32px,4vw,56px);line-height:1;letter-spacing:-0.03em;margin:0;">100%</p><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 0;">On-time delivery</p></div>
+      <div style="text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:900;color:#F0F0F0;font-size:clamp(32px,4vw,56px);line-height:1;letter-spacing:-0.03em;margin:0;">3×</p><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 0;">Avg. efficiency gain</p></div>
+      <div style="text-align:center;"><p style="font-family:'Inter Tight',sans-serif;font-weight:900;color:#F0F0F0;font-size:clamp(32px,4vw,56px);line-height:1;letter-spacing:-0.03em;margin:0;">24/7</p><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 0;">Agents running</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer id="footer" style="position:relative;border-top:1px solid rgba(0,143,45,0.2);overflow:hidden;">
+  <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:600px;height:300px;border-radius:50%;background:rgba(0,227,74,0.05);filter:blur(120px);pointer-events:none;"></div>
+  <div style="position:relative;padding:80px 48px 48px;max-width:1280px;margin:0 auto;">
+    <!-- Big tagline -->
+    <div style="margin-bottom:64px;padding-bottom:56px;border-bottom:1px solid rgba(0,143,45,0.1);">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(0,227,74,0.6);text-transform:uppercase;letter-spacing:0.15em;margin:0 0 16px;">— Gour Agency</p>
+      <h2 style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#F0F0F0;font-size:clamp(40px,7vw,100px);line-height:0.9;letter-spacing:-0.03em;margin:0;">
+        LET'S BUILD<br /><span style="color:#00E34A;">SOMETHING</span><br />GREAT.
+      </h2>
+    </div>
+    <!-- 3-col grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px;margin-bottom:64px;" class="footer-grid">
+      <!-- Col 1 -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-family:'Inter Tight',sans-serif;font-weight:900;text-transform:uppercase;color:#00E34A;font-size:clamp(52px,6vw,80px);line-height:1;letter-spacing:-0.04em;">GOUR</span>
+          <span style="font-family:'Inter Tight',sans-serif;font-weight:300;text-transform:uppercase;color:rgba(255,255,255,0.3);font-size:clamp(52px,6vw,80px);line-height:1;letter-spacing:-0.04em;">/</span>
+        </div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#878787;line-height:1.7;max-width:220px;margin:0;">We build AI agents, SaaS platforms, and mobile apps that help businesses grow faster.</p>
+        <div style="display:flex;align-items:center;gap:8px;border:1px solid rgba(0,143,45,0.3);border-radius:500px;padding:6px 12px;width:fit-content;">
+          <span style="position:relative;display:flex;width:8px;height:8px;">
+            <span style="position:absolute;display:inline-flex;width:100%;height:100%;border-radius:50%;background:#00E34A;opacity:0.75;" class="animate-ping"></span>
+            <span style="position:relative;display:inline-flex;width:8px;height:8px;border-radius:50%;background:#00E34A;"></span>
+          </span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#00E34A;text-transform:uppercase;letter-spacing:0.1em;">Taking new projects</span>
+        </div>
+      </div>
+      <!-- Col 2 -->
+      <div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 24px;">Services</p>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <button onclick="scrollTo('telemetry')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">AI Agents &amp; Automation</button>
+          <button onclick="scrollTo('saas')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">Custom SaaS &amp; Web Apps</button>
+          <button onclick="scrollTo('mobile')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">Mobile App Development</button>
+          <button onclick="scrollTo('capabilities')" style="background:none;border:none;color:rgba(240,240,240,0.7);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0;" onmouseover="this.style.color='#00E34A'" onmouseout="this.style.color='rgba(240,240,240,0.7)'">All Services</button>
+        </div>
+      </div>
+      <!-- Col 3 -->
+      <div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.15em;margin:0 0 24px;">Get in touch</p>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 4px;">Location</p><p style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(240,240,240,0.7);margin:0 0 2px;">Based in India</p><p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#878787;margin:0;">Building globally</p></div>
+          <div><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px;">Book a call</p><a href="https://cal.com/aadarsh-kumar-singh-ptvf2a/secret" target="_blank" class="pill-btn" style="font-size:11px;padding:10px 20px;">BOOK A FREE CALL →</a></div>
+          <div><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 4px;">Response time</p><p style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#00E34A;margin:0;">Within 48 hours</p></div>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom bar -->
+    <div style="border-top:1px solid rgba(0,143,45,0.1);padding-top:32px;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <img src="https://gour.io/assests/gour-logo-nav-white.svg" alt="Gour Logo" style="height:20px;width:auto;opacity:0.5;" />
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;">© 2026 Do4SelfSolutions LLC. All rights reserved.</span>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(135,135,135,0.5);letter-spacing:0.03em;">Gour Agency is a brand of Do4SelfSolutions LLC · Registered in the United States</span>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#878787;text-transform:uppercase;letter-spacing:0.1em;">India · Remote · Global</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════ RESPONSIVE STYLES ═══════════════════════════ -->
+<style>
+  @keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @media (max-width: 768px) {
+    .service-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+    .service-grid > div:first-child { position: static !important; }
+    .footer-grid { grid-template-columns: 1fr !important; }
+    .stats-grid { grid-template-columns: repeat(2,1fr) !important; }
+    #main-nav .nav-links { display: none !important; }
+    #main-nav .nav-cta { display: none !important; }
+    #hamburger { display: flex !important; }
+    section, footer { padding-left: 24px !important; padding-right: 24px !important; }
+    section > div { padding-left: 0 !important; padding-right: 0 !important; }
+    #book-call { padding: 80px 24px !important; }
+  }
+</style>
+
+<!-- ═══════════════════════════ SCRIPTS ═══════════════════════════ -->
+<script>
+// ── Scroll util ──
+function scrollTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Mobile menu ──
+function toggleMenu() {
+  const menu = document.getElementById('mobile-menu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── Nav scroll state ──
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-nav');
+  if (window.scrollY > 50) {
+    nav.style.background = 'rgba(5,5,5,0.9)';
+    nav.style.backdropFilter = 'blur(24px)';
+    nav.style.borderBottom = '1px solid rgba(0,143,45,0.2)';
+  } else {
+    nav.style.background = 'transparent';
+    nav.style.backdropFilter = 'none';
+    nav.style.borderBottom = 'none';
+  }
+}, { passive: true });
+
+// ── System clock ──
+setInterval(() => {
+  const el = document.getElementById('sys-time');
+  if (el) el.textContent = new Date().toISOString().split('T')[1].split('.')[0];
+}, 1000);
+
+// ── WebGL Hero ──
+(function() {
+  const VS = `attribute vec2 a_pos; void main(){gl_Position=vec4(a_pos,0.0,1.0);}`;
+  const FS = `precision highp float;
+uniform float u_time; uniform vec2 u_res; uniform float u_intensity;
+uniform float u_complexity; uniform vec3 u_mouse; uniform float u_rotationSpeed;
+float hash(vec2 p){vec3 p3=fract(vec3(p.xyx)*0.1031);p3+=dot(p3,p3.yzx+33.33);return fract((p3.x+p3.y)*p3.z);}
+float vnoise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float v=0.0;float a=0.5;mat2 r=mat2(0.8,0.6,-0.6,0.8);for(int i=0;i<5;i++){v+=a*vnoise(p);p=r*p*2.0+vec2(100.0);a*=0.5;}return v;}
+float wn(vec2 p,float t){vec2 q=vec2(fbm(p+t*0.1),fbm(p+vec2(5.2,1.3)+t*0.08));return fbm(p+4.0*q);}
+void main(){
+  vec2 uv=(gl_FragCoord.xy-u_res*0.5)/min(u_res.x,u_res.y);
+  float r=length(uv); float theta=atan(uv.y,uv.x);
+  float rd=r/(1.0+r*r*0.3);
+  float angle=theta+u_rotationSpeed*0.15;
+  float t=u_time;
+  float w=wn(vec2(rd*3.0,angle*0.5),t*0.2);
+  float pr=pow(0.5+0.5*sin(angle*u_complexity+rd*4.0-t*0.5+w*2.0),2.0);
+  float sr=pow(sin(angle*12.0+rd*6.0+t*0.3)*0.5+0.5,8.0);
+  float it=sin(angle*48.0+t*0.7)*sin(rd*32.0-t*0.4)*0.5+0.5;
+  vec3 c1=vec3(0.0,0.89,0.29); vec3 c2=vec3(0.2,0.8,0.5); vec3 c3=vec3(0.0,0.3,0.1);
+  float hs=sin(rd*3.0+t*0.2)*0.15;
+  vec3 c2s=c2+vec3(hs,-hs*0.3,hs*0.2);
+  vec3 color=c3; color=mix(color,c2s,pr*0.6); color=mix(color,c1,sr*0.4*it);
+  color+=vec3(0.5,1.0,0.7)*exp(-rd*rd*8.0)*1.2;
+  color+=vec3(0.2,0.8,0.4)*exp(-r*r*4.0)*u_mouse.z;
+  color+=hash(gl_FragCoord.xy+fract(u_time*43.0)*1000.0)*0.04-0.02;
+  color*=max(1.0-r*r*0.8,0.0);
+  color=max(color,vec3(0.0));
+  color=pow(color,vec3(0.9))*u_intensity;
+  gl_FragColor=vec4(color,1.0);
+}`;
+  const canvas = document.getElementById('hero-canvas');
+  const gl = canvas.getContext('webgl', { alpha: false, antialias: false });
+  if (!gl) return;
+  function shader(type, src) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS));
+  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  const posLoc = gl.getAttribLocation(prog, 'a_pos');
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(posLoc);
+  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+  const U = {
+    time: gl.getUniformLocation(prog, 'u_time'),
+    res: gl.getUniformLocation(prog, 'u_res'),
+    intensity: gl.getUniformLocation(prog, 'u_intensity'),
+    complexity: gl.getUniformLocation(prog, 'u_complexity'),
+    mouse: gl.getUniformLocation(prog, 'u_mouse'),
+    rot: gl.getUniformLocation(prog, 'u_rotationSpeed'),
+  };
+  const dpr = Math.min(devicePixelRatio, 2);
+  function resize() {
+    canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(U.res, canvas.width, canvas.height);
+  }
+  resize(); window.addEventListener('resize', resize);
+  gl.uniform1f(U.intensity, 1.2); gl.uniform1f(U.complexity, 8.0);
+  const mouse = { x:0, y:0, vel:0, lastX:0, lastY:0, active:0 };
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX/innerWidth*2-1; mouse.y = e.clientY/innerHeight*2-1;
+    const dx = e.clientX-mouse.lastX, dy = e.clientY-mouse.lastY;
+    mouse.vel = Math.sqrt(dx*dx+dy*dy)/16;
+    mouse.lastX = e.clientX; mouse.lastY = e.clientY; mouse.active = 1;
+  });
+  const t0 = performance.now();
+  (function frame() {
+    const t = (performance.now()-t0)/1000;
+    mouse.vel *= 0.95;
+    gl.uniform1f(U.time, t);
+    gl.uniform3f(U.mouse, mouse.x, mouse.y, mouse.vel * mouse.active);
+    gl.uniform1f(U.rot, t * 0.5 + mouse.vel * 2.0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(frame);
+  })();
+})();
+
+// ── Capabilities 3D grid ──
+(function() {
+  const BASE = 'https://raw.githubusercontent.com/happyhaplu/gour-agency/main/app/public/assets/';
+  const IMGS = ['hero-bg.jpg','server-rack.jpg','neural-network.jpg','code-reflection.jpg','android-face.jpg'];
+  const grid = document.getElementById('cap-grid');
+  const allImgs = [...IMGS,...IMGS,...IMGS,...IMGS,...IMGS,...IMGS,...IMGS].slice(0,32);
+  allImgs.forEach(img => {
+    const div = document.createElement('div');
+    div.className = 'grid__item';
+    div.style.cssText = 'position:relative;overflow:hidden;transform-style:preserve-3d;backface-visibility:hidden;min-height:200px;';
+    div.innerHTML = `<div style="width:100%;height:100%;min-height:200px;background-image:url(${BASE+img});background-size:cover;background-position:center;backface-visibility:hidden;"></div>`;
+    grid.appendChild(div);
+  });
+
+  gsap.registerPlugin(ScrollTrigger);
+  const items = gsap.utils.toArray('.grid__item');
+  gsap.set(items, {
+    transformOrigin:'50% 0%',
+    translateZ:() => gsap.utils.random(-6000,-2000),
+    rotateX:() => gsap.utils.random(-65,-25),
+    scale:() => gsap.utils.random(2,5),
+  });
+  const tl = gsap.timeline({ scrollTrigger:{ trigger:'#cap-grid', start:'top top+=5%', end:'bottom top', scrub:true } });
+  tl.to(items, { ease:'power1', yPercent:()=>gsap.utils.random(-100,100), rotateY:-720, scale:0.5, stagger:0.005 });
+})();
+
+// ── GSAP scroll animations ──
+(function() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Image hover zoom for all service images
+  ['img-ai','img-saas','img-mobile'].forEach(id => {
+    const wrap = document.getElementById(id);
+    if (!wrap) return;
+    const img = wrap.querySelector('img');
+    wrap.addEventListener('mouseenter', () => gsap.to(img, { scale:1.06, duration:1.2, ease:'expo.out' }));
+    wrap.addEventListener('mouseleave', () => gsap.to(img, { scale:1, duration:1.2, ease:'expo.inOut' }));
+  });
+
+  // Step cards stagger
+  ['steps-ai','steps-saas','steps-mobile'].forEach(id => {
+    const container = document.getElementById(id);
+    if (!container) return;
+    const items = container.querySelectorAll('.step-item');
+    gsap.fromTo(items,
+      { opacity:0, x:-16 },
+      { opacity:1, x:0, stagger:0.1, duration:0.6, ease:'expo.out',
+        scrollTrigger:{ trigger:container, start:'top 80%' } }
+    );
+  });
+
+  // CTA headline + button
+  gsap.to('#cta-headline', { opacity:1, y:0, duration:1, ease:'expo.out',
+    scrollTrigger:{ trigger:'#book-call', start:'top 75%' } });
+  gsap.to('#cta-btn', { opacity:1, y:0, duration:0.8, ease:'expo.out', delay:0.25,
+    scrollTrigger:{ trigger:'#book-call', start:'top 75%' } });
+})();
+</script>
+
+</body>
+</html>
